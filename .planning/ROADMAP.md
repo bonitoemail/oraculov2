@@ -121,7 +121,7 @@ See: `.planning/milestones/v3.1-ROADMAP.md`
 - [x] **Phase 32: Q5B Branch (Paraiso gap closure)** - Add "O Que Já Não Cabe" branch triggered by q4=A && q5=A (completed 2026-04-07)
 - [x] **Phase 33: Q6B + ESPELHO_SILENCIOSO** - Add "O Espelho Extra" branch + new DEVOLUCAO_ESPELHO_SILENCIOSO archetype (completed 2026-04-07)
 - [x] **Phase 34: Detectable Archetypes** - Add CONTRA_FOBICO and PORTADOR archetypes leveraging new branch data (completed 2026-04-08)
-- [x] **Phase 35: Timing Mitigation + Browser UAT** - Validate 96 path permutations + browser UAT in ≥3 paths (completed 2026-04-08)
+- [x] **Phase 35: Timing Mitigation + Browser UAT** - Validate 96 path permutations + browser UAT in >=3 paths (completed 2026-04-08)
 
 See: `.planning/milestones/v6.0-ROADMAP.md` for full phase details, success criteria, and requirements traceability.
 
@@ -145,7 +145,11 @@ See: `.planning/milestones/v6.0-ROADMAP.md` for full phase details, success crit
   2. New env var ELEVENLABS_VOICE_ID_V2 exists and configures somber voice for V2
   3. Version context (V1 vs V2) can be passed through the component tree and persists during session
   4. Voice classification metadata is queryable by audio services to determine which voice ID to use
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 36-01-PLAN.md — VoiceType + getVoiceType() + getVoiceId() with TDD + ELEVENLABS_VOICE_ID_V2 env var
+- [ ] 36-02-PLAN.md — VersionContext provider + hook + page.tsx wiring
 
 ### Phase 37: Dual-Voice Service Layer
 **Goal**: Audio services route to correct voice based on version and segment type
@@ -379,14 +383,14 @@ Plans:
 **UI hint**: no
 
 ### Phase 35: Timing Mitigation + Browser UAT
-**Goal**: Validate timing across 24 path permutations, mitigate overflow if needed, browser UAT in ≥3 representative paths, update roteiro.html and CLAUDE.md.
+**Goal**: Validate timing across 24 path permutations, mitigate overflow if needed, browser UAT in >=3 representative paths, update roteiro.html and CLAUDE.md.
 **Depends on**: Phase 34
 **Requirements**: POL-01, POL-03, UAT-01
 **Plans:** 3/3 plans complete
 
 Plans:
 - [x] 35-01-PLAN.md — Timing validation across 24 paths + overflow mitigation if max-path > 7:30
-- [x] 35-02-PLAN.md — Browser UAT across ≥3 representative paths (short, long, branch-heavy)
+- [x] 35-02-PLAN.md — Browser UAT across >=3 representative paths (short, long, branch-heavy)
 - [x] 35-03-PLAN.md — Update roteiro.html timing table + CLAUDE.md status documentation
 
 **UI hint**: no
@@ -409,7 +413,7 @@ Plans:
 | 33. Q6B + ESPELHO_SILENCIOSO | v6.0 | 3/3 | Complete    | 2026-04-07 |
 | 34. Detectable Archetypes | v6.0 | 3/3 | Complete    | 2026-04-08 |
 | 35. Timing + UAT | v6.0 | 3/3 | Complete    | 2026-04-08 |
-| 36. Dual-Voice Data Layer | v6.1 | 0/TBD | Not started | - |
+| 36. Dual-Voice Data Layer | v6.1 | 0/2 | Planning complete | - |
 | 37. Dual-Voice Service Layer | v6.1 | 0/TBD | Not started | - |
 | 38. Version Selector & UI Integration | v6.1 | 0/TBD | Not started | - |
 | 39. Audio Generation & Polish | v6.1 | 0/TBD | Not started | - |
@@ -426,4 +430,4 @@ v6.1 Duas Vozes (active):
 
 ---
 
-*Last updated: 2026-05-08 -- v6.1 Duas Vozes roadmap created (4 phases, 11 requirements mapped)*
+*Last updated: 2026-05-08 -- Phase 36 planned (2 plans in 1 wave)*

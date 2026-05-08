@@ -1,54 +1,46 @@
 # Requirements: O Oraculo
 
-**Defined:** 2026-04-06 (v6.0)
+**Defined:** 2026-05-08 (v6.1)
 **Core Value:** Experiencia seamless e imersiva como um jogo — o visitante fala, ouve, e e transformado.
 
-## v6.0 Requirements (Active)
+## v6.1 Requirements (Active)
 
-Requirements for **Deep Branching** milestone. Adicionar 3 novas branches condicionais (Q1B, Q5B, Q6B) ao fluxo do Oráculo, mais o arquétipo DEVOLUCAO_ESPELHO_SILENCIOSO e 2 arquétipos detectáveis novos (CONTRA_FOBICO, PORTADOR), aprofundando a sensação oracular sem gamificar.
+Requirements for **Duas Vozes** milestone. Criar versão V2 da experiência com sistema de duas vozes (Voz 1 = perguntas, Voz 2 soturna = narrativa/devoluções), preservando V1 intacta, com seletor na home.
 
-Source of truth: `memory/next-milestone-v5-deep-branching.md` (blueprint completo com scripts, guards, MP3 specs).
+### Versioning
 
-### Branching (Conditional Branches)
+- [ ] **VER-01**: Operador/visitante pode escolher entre V1 e V2 na home page antes de iniciar
+- [ ] **VER-02**: Escolha de versão persiste durante toda a sessão (não reseta entre estados)
+- [ ] **VER-03**: V1 funciona exatamente como hoje (zero regressão)
 
-- [x] **BR-01**: Visitor com `q1='B' && q2='B'` (saiu da sala E ficou olhando a coisa) ouve a branch Q1B "A Porta no Fundo" — **6 SCRIPT keys** (SETUP, PERGUNTA, RESPOSTA_A, RESPOSTA_B, FALLBACK, TIMEOUT — onde SETUP/RESPOSTA são arrays multi-segmento gerando 1 MP3 cada, seguindo o padrão v4.0), QUESTION_META[9], guard `shouldBranchQ1B`, estados Q1B_* na máquina, OracleExperience extended, **6 MP3s** gerados
-- [x] **BR-02**: Visitor com `q4='A' && q5='A'` (lembrou tudo E carrega a pergunta) ouve a branch Q5B "O Que Já Não Cabe" — 6 SCRIPT keys (mesmo padrão de BR-01), QUESTION_META[10], guard `shouldBranchQ5B`, estados Q5B_*, OracleExperience extended, 6 MP3s gerados
-- [x] **BR-03**: Visitor com `q5='B' && q6='A'` (dissolveu pergunta MAS pediu leitura) ouve a branch Q6B "O Espelho Extra" — 6 SCRIPT keys (mesmo padrão), QUESTION_META[11], guard `shouldBranchQ6B`, estados Q6B_*, OracleExperience extended, 6 MP3s gerados, transição condicional para DEVOLUCAO normal vs DEVOLUCAO_ESPELHO_SILENCIOSO
+### Dual-Voice
 
-### Arquétipos (Devoluções)
+- [ ] **VOZ-01**: Cada script key é classificado como VOZ_PERGUNTA ou VOZ_NARRATIVA (metadata no script ou mapeamento separado)
+- [ ] **VOZ-02**: Nova env `ELEVENLABS_VOICE_ID_V2` configura a voz soturna (server-side only)
+- [ ] **VOZ-03**: API route `/api/tts` aceita parâmetro de voice ID (V1 vs V2) baseado na versão e tipo de segmento
+- [ ] **VOZ-04**: FallbackTTS na V2 busca MP3 narrativos em `public/audio/prerecorded/v2/`, perguntas continuam na raiz
+- [ ] **VOZ-05**: Na V2, segmentos PERGUNTA usam Voz 1 (atual) e segmentos narrativos usam Voz 2 (soturna)
 
-- [x] **AR-01**: DEVOLUCAO_ESPELHO_SILENCIOSO arquetipo criado — 6 segmentos no script (devolve forma em vez de conteúdo, ~22-28s), 6 MP3s, guard `isEspelhoSilencioso` com **highest priority** no `always` do estado DEVOLUCAO (deve verificar antes dos 8 arquétipos atuais), trigger: `q6b === 'B'`
-- [x] **AR-02**: CONTRA_FOBICO arquétipo detectável — guard `isContraFobico` em `patternMatching.ts` (trigger: `q1==='B' && q2==='B' && q1b==='A'`), DEVOLUCAO_CONTRA_FOBICO script + MP3s, ordem nos `always` do DEVOLUCAO: ESPELHO_SILENCIOSO → CONTRA_FOBICO → PORTADOR → 8 atuais
-- [x] **AR-03**: PORTADOR arquétipo detectável — guard `isPortador` (trigger: `q4==='A' && q5==='A' && q5b==='A'`), DEVOLUCAO_PORTADOR script + MP3s
+### Audio
 
-### Polish & Validation
+- [ ] **AUD-01**: Script de geração (`generate-audio-v3.ts`) suporta dual-voice (gerar com voice ID diferente por tipo de segmento)
+- [ ] **AUD-02**: MP3s V2 (segmentos narrativos com voz soturna) gerados em `public/audio/prerecorded/v2/`
+- [ ] **AUD-03**: Fix "faça" no ENCERRAMENTO regenerado como MP3 (V1 e V2)
 
-- [x] **POL-01**: Max-path do fluxo permanece ≤ 7:30 — `scripts/validate-timing.ts` atualizado para cobrir todas as novas permutações (96 caminhos), pior caso (Q1B + Q4B + Q5B + Q6B) medido e documentado, mitigação aplicada se > 7:30 (cortar SETUPs base de Q1/Q3/Q5) ou overflow aceito com documentação
-- [x] **POL-02**: ChoiceMap context type extended em `oracleMachine.types.ts` com campos opcionais `q1b?`, `q5b?`, `q6b?` sem quebrar arquétipos existentes (testes v4.0 continuam passando)
-- [ ] **POL-03**: `public/roteiro.html` atualizado com as 3 novas branches no Mermaid flowchart + texto narrativo, mantendo paridade com `src/data/script.ts`
+## v6.0 Deep Branching (Shipped)
 
-### UAT
+All 10 requirements satisfied (BR-01 through UAT-01). 5 conditional branches (Q1B, Q2B, Q4B, Q5B, Q6B), 3 new archetypes (ESPELHO_SILENCIOSO, CONTRA_FOBICO, PORTADOR), 82 MP3s, 78-state machine.
 
-- [ ] **UAT-01**: Browser UAT validado em ≥3 caminhos representativos: (a) caminho sem nenhuma branch nova ativa, (b) caminho com todas as branches Q1B+Q5B+Q4B disparando, (c) caminho com Q6B → DEVOLUCAO_ESPELHO_SILENCIOSO
-
-## v5.0 Tester UI Polish (Informally Shipped)
-
-Phase 30 R3F audio-reactive visuals shipped via direct commits + subsequent ad-hoc work (ambient audio, voice pipeline 9 fixes, intro delay, roteiro page). Never formally closed via `/gsd:complete-milestone`.
-
-### Visual
-
-- [x] **VIS-01**: Full-screen audio-reactive R3F background (Phase 30) — Shipped
-- [x] **VIS-02**: Background visual style per narrative phase — Shipped (per recent commits)
-- [~] **VIS-03**: Smooth visual transitions between phases — Shipped via ad-hoc work
-- [~] **VIS-04**: Idle state ambient animation — Shipped via ad-hoc work
-
-### Microphone, Debug, UX, Polish
-
-VIS/MIC/DBG/UX/POL requirements from v5.0 dropped or absorbed into ad-hoc work. See git history for actual delivered scope (commits 5c121a1, ac8d8b7, 3273b38, 4499327, 92eeb36).
-
-## v4.0 Game Flow (Complete)
-
-All 16 requirements satisfied (PACE-01 through INTG-02). See `.planning/MILESTONES.md` and STATE.md history.
+- [x] BR-01: Q1B branch contra-fobica — Phase 31
+- [x] BR-02: Q5B branch Paraíso — Phase 32
+- [x] BR-03: Q6B branch pré-devolução — Phase 33
+- [x] AR-01: DEVOLUCAO_ESPELHO_SILENCIOSO — Phase 33
+- [x] AR-02: CONTRA_FOBICO archetype — Phase 34
+- [x] AR-03: PORTADOR archetype — Phase 34
+- [x] POL-01: Max-path ≤ 7:30 — Phase 35
+- [x] POL-02: ChoiceMap extension — Phase 31
+- [x] POL-03: roteiro.html sync — Phase 35
+- [x] UAT-01: Browser UAT — Phase 35
 
 ## Future Requirements
 
@@ -62,44 +54,37 @@ All 16 requirements satisfied (PACE-01 through INTG-02). See `.planning/MILESTON
 
 - **ANALYTICS-01**: Supabase analytics backend (Phase 6)
 
-## Out of Scope (v6.0)
+## Out of Scope (v6.1)
 
 | Feature | Reason |
 |---------|--------|
-| Branches Q3B, Q6B-mainline | Out of scope for v6.0 — apenas Q1B, Q5B e Q6B-pre-devolução nesta milestone |
-| Arquétipo PORTADOR_DE_PERGUNTA (variante de PORTADOR) | Diferenciação muito sutil para o Bienal — uma única forma é suficiente |
-| Cortar SETUPs base de Q1/Q3/Q5 | Só se POL-01 falhar — primeira opção é aceitar overflow ~1-3% visitantes |
-| Translation/i18n da nova branch para outros idiomas | PT-BR only — Bienal SBPRP é evento brasileiro |
-| Refactor da arquitetura de guards atual | Manter padrão existente — adicionar guards segue o pattern já estabelecido |
-| Visual feedback diferente quando branch dispara | Branching deve sentir-se ORACULAR, não gamificado — visitante não vê "branch unlocked" |
+| Mudar roteiro/script text (além do fix "faça") | Roteiro aprovado — apenas correção pontual |
+| Terceira voz | Escopo é dual-voice apenas |
+| Voice settings diferentes por fase na V2 | Voz soturna usa settings uniformes por enquanto |
+| Geração de áudio em runtime com voz dinâmica | Pre-recorded MP3s continuam sendo o modelo principal |
+| Refactor da state machine para V2 | Machine é a mesma — diferença é apenas no áudio |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BR-01 | Phase 31 | Complete |
-| BR-02 | Phase 32 | Complete |
-| BR-03 | Phase 33 | Complete |
-| AR-01 | Phase 33 | Complete |
-| AR-02 | Phase 34 | Complete |
-| AR-03 | Phase 34 | Complete |
-| POL-01 | Phase 35 | Complete |
-| POL-02 | Phase 31 | Complete |
-| POL-03 | Phase 35 | Pending |
-| UAT-01 | Phase 35 | Pending |
+| VER-01 | TBD | Pending |
+| VER-02 | TBD | Pending |
+| VER-03 | TBD | Pending |
+| VOZ-01 | TBD | Pending |
+| VOZ-02 | TBD | Pending |
+| VOZ-03 | TBD | Pending |
+| VOZ-04 | TBD | Pending |
+| VOZ-05 | TBD | Pending |
+| AUD-01 | TBD | Pending |
+| AUD-02 | TBD | Pending |
+| AUD-03 | TBD | Pending |
 
 **Coverage:**
-- v6.0 requirements: 10 total
-- Mapped to phases: 10/10 (100%)
-- Unmapped: 0 ✓
-
-**Phase breakdown:**
-- Phase 31 (Q1B Branch): BR-01, POL-02 (ChoiceMap extension starts here)
-- Phase 32 (Q5B Branch): BR-02
-- Phase 33 (Q6B + ESPELHO_SILENCIOSO): BR-03, AR-01
-- Phase 34 (Detectable Archetypes): AR-02, AR-03
-- Phase 35 (Timing Mitigation + UAT): POL-01, POL-03, UAT-01
+- v6.1 requirements: 11 total
+- Mapped to phases: 0 (awaiting roadmap)
+- Unmapped: 11
 
 ---
-*Requirements defined: 2026-04-06*
-*Last updated: 2026-04-06 — v6.0 Deep Branching milestone start*
+*Requirements defined: 2026-05-08*
+*Last updated: 2026-05-08 after initial definition*

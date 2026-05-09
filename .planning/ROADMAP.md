@@ -177,8 +177,11 @@ Plans:
   3. OracleExperience component receives version context and routes audio requests accordingly
   4. V1 experience plays exactly as it does today with zero changes to audio, timing, or behavior
   5. V2 experience plays with dual voices (questions in Voice 1, narrative in Voice 2)
-**Plans**: TBD
-**UI hint**: yes
+**Plans:** 2 plans
+
+Plans:
+- [ ] 38-01-PLAN.md — VersionSelector component + OracleExperience wiring (PermissionScreen -> VersionSelector -> StartButton flow)
+- [ ] 38-02-PLAN.md — V1 regression tests + V2 selection flow verification + full suite regression check
 
 ### Phase 39: Audio Generation & Polish
 **Goal**: All V2 narrative MP3s generated with somber voice plus "faça" fix applied to both versions
@@ -419,7 +422,7 @@ Plans:
 | 35. Timing + UAT | v6.0 | 3/3 | Complete    | 2026-04-08 |
 | 36. Dual-Voice Data Layer | v6.1 | 2/2 | Complete    | 2026-05-09 |
 | 37. Dual-Voice Service Layer | v6.1 | 2/2 | Complete    | 2026-05-09 |
-| 38. Version Selector & UI Integration | v6.1 | 0/TBD | Not started | - |
+| 38. Version Selector & UI Integration | v6.1 | 0/2 | Not started | - |
 | 39. Audio Generation & Polish | v6.1 | 0/TBD | Not started | - |
 
 ## Dependencies
@@ -434,4 +437,4 @@ v6.1 Duas Vozes (active):
 
 ---
 
-*Last updated: 2026-05-09 -- Phase 37 complete (dual-voice service layer: interface + API route + client-side TTS routing)*
+*Last updated: 2026-05-09 -- Phase 38 planned (2 plans: version selector component + regression tests)*

@@ -21,16 +21,16 @@ progress:
 
 **Current Milestone:** v6.1 Duas Vozes
 
-**Current Focus:** Phase 37 — Dual-Voice Service Layer
+**Current Focus:** Phase 38 — Version Selector & UI Integration
 
 ## Current Position
 
-Phase: 37 of 39 (Dual-Voice Service Layer) -- COMPLETE
-Plan: 2 of 2 in current phase (all plans complete)
-Status: Phase 37 complete, ready for Phase 38
-Last activity: 2026-05-09 — Plan 37-02 complete (client-side TTS voice routing)
+Phase: 38 of 39 (Version Selector & UI Integration) -- NOT STARTED
+Plan: 0 of TBD in current phase
+Status: Phase 37 complete, Phase 38 next
+Last activity: 2026-05-09 — Phase 37 complete (dual-voice service layer verified 5/5)
 
-Progress: [█████████████████████████████████████░░] 95% (37/39 phases complete)
+Progress: [██████████████████████████████████████░] 95% (37/39 phases complete)
 
 ## Performance Metrics
 
@@ -44,7 +44,7 @@ Progress: [███████████████████████
 **Milestone v6.1 Duas Vozes (Active):**
 
 - Phases: 4 (Phases 36-39)
-- Plans: 3/TBD completed
+- Plans: 4/TBD completed
 - Requirements: 11 (VER-01 to AUD-03)
 - Goal: Sistema de duas vozes (Voz 1 perguntas, Voz 2 narrativa) com seletor V1/V2 na home
 - Coverage: 11/11 requirements mapped (100%)
@@ -97,5 +97,5 @@ Items carried forward from previous milestones:
 ## Session Continuity
 
 Last session: 2026-05-09
-Stopped at: Completed 37-02-PLAN.md (client-side TTS voice routing + dual-directory + tests)
-Resume: Phase 38 — Version Selector & UI Integration
+Stopped at: Phase 37 complete — all dual-voice service layer verified (5/5 must-haves)
+Resume: Phase 38 — Version Selector & UI Integration (next phase)

@@ -1,7 +1,8 @@
 import type { TTSService, VoiceSettings } from './index';
-import type { SpeechSegment } from '@/types';
+import type { SpeechSegment, ExperienceVersion, VoiceType } from '@/types';
 import { getAudioContext, getGainNode, getEffectsInput, initAudioContext } from '@/lib/audio/audioContext';
 import { SCRIPT } from '@/data/script';
+import { getVoiceType } from '@/lib/voice/voiceClassification';
 
 /**
  * Pre-recorded audio URLs for offline fallback.
@@ -40,7 +41,13 @@ export class FallbackTTSService implements TTSService {
    * Speaks the given segments using pre-recorded audio.
    * Matches segment text against SCRIPT entries to find the correct audio file.
    */
-  async speak(segments: SpeechSegment[], voiceSettings: VoiceSettings, scriptKey?: string): Promise<void> {
+  async speak(
+    segments: SpeechSegment[],
+    voiceSettings: VoiceSettings,
+    scriptKey?: string,
+    version?: ExperienceVersion,
+    voiceType?: VoiceType,
+  ): Promise<void> {
     // Bump generation so stale onended callbacks from previous speak() are ignored
     const generation = ++this.speakGeneration;
     this.cancelled = false;
@@ -53,10 +60,8 @@ export class FallbackTTSService implements TTSService {
       return this.fallbackToSpeechSynthesis(segments, voiceSettings);
     }
 
-    const url = PRERECORDED_URLS[resolvedKey];
-    if (!url) {
-      return this.fallbackToSpeechSynthesis(segments, voiceSettings);
-    }
+    const resolvedVoiceType = voiceType ?? getVoiceType(resolvedKey);
+    const url = this.getPrerecordedUrl(resolvedKey, version, resolvedVoiceType);
 
     try {
       // Check for cancellation before starting
@@ -69,8 +74,9 @@ export class FallbackTTSService implements TTSService {
         this.audioContext = await initAudioContext();
       }
 
-      // Check cache first
-      let buffer = this.audioBufferCache.get(resolvedKey);
+      // Check cache first (versioned key to prevent cross-version contamination)
+      const cacheKey = `${version || 'V1'}:${resolvedKey}`;
+      let buffer = this.audioBufferCache.get(cacheKey);
 
       if (!buffer) {
         // Fetch and decode audio
@@ -83,7 +89,7 @@ export class FallbackTTSService implements TTSService {
         buffer = await this.audioContext.decodeAudioData(arrayBuffer);
 
         // Cache for future use
-        this.audioBufferCache.set(resolvedKey, buffer);
+        this.audioBufferCache.set(cacheKey, buffer);
       }
 
       // Check for cancellation before playback
@@ -119,6 +125,8 @@ export class FallbackTTSService implements TTSService {
 
   /**
    * Pre-loads all pre-recorded audio buffers into cache.
+   * Note: preloadAll() only preloads V1 (root directory) MP3s.
+   * V2 narrative MP3s are loaded on-demand during speak().
    */
   async preloadAll(): Promise<void> {
     if (!this.audioContext) {
@@ -244,9 +252,18 @@ export class FallbackTTSService implements TTSService {
   }
 
   /**
-   * Helper for tests - gets pre-recorded URL for a script key.
+   * Returns the pre-recorded URL for a script key.
+   * V2 narrative segments load from /audio/prerecorded/v2/ directory.
+   * All other segments (V1, V2 questions) load from /audio/prerecorded/ root.
    */
-  private getPrerecordedUrl(key: string): string {
+  private getPrerecordedUrl(
+    key: string,
+    version: ExperienceVersion = 'V1',
+    voiceType: VoiceType = 'VOZ_PERGUNTA',
+  ): string {
+    if (version === 'V2' && voiceType === 'VOZ_NARRATIVA') {
+      return `/audio/prerecorded/v2/${key.toLowerCase()}.mp3`;
+    }
     return `/audio/prerecorded/${key.toLowerCase()}.mp3`;
   }
 }

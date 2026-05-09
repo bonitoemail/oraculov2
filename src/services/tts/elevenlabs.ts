@@ -1,5 +1,5 @@
 import type { TTSService, VoiceSettings } from './index';
-import type { SpeechSegment } from '@/types';
+import type { SpeechSegment, ExperienceVersion, VoiceType } from '@/types';
 import { getAudioContext, getEffectsInput, initAudioContext } from '@/lib/audio/audioContext';
 import { FallbackTTSService } from './fallback';
 
@@ -13,7 +13,13 @@ export class ElevenLabsTTSService implements TTSService {
     this.fallbackService = new FallbackTTSService();
   }
 
-  async speak(segments: SpeechSegment[], voiceSettings: VoiceSettings, scriptKey?: string): Promise<void> {
+  async speak(
+    segments: SpeechSegment[],
+    voiceSettings: VoiceSettings,
+    scriptKey?: string,
+    version?: ExperienceVersion,
+    voiceType?: VoiceType,
+  ): Promise<void> {
     this.cancelled = false;
 
     try {
@@ -32,6 +38,8 @@ export class ElevenLabsTTSService implements TTSService {
             style: voiceSettings.style,
             ...(voiceSettings.speed != null ? { speed: voiceSettings.speed } : {}),
           },
+          ...(version ? { version } : {}),
+          ...(scriptKey ? { script_key: scriptKey } : {}),
         }),
       });
 
@@ -71,7 +79,7 @@ export class ElevenLabsTTSService implements TTSService {
         throw new Error('Speech cancelled');
       }
       console.warn('[ElevenLabs] API failed, using fallback:', error);
-      return this.fallbackService.speak(segments, voiceSettings, scriptKey);
+      return this.fallbackService.speak(segments, voiceSettings, scriptKey, version, voiceType);
     }
   }
 

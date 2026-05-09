@@ -132,7 +132,7 @@ See: `.planning/milestones/v6.0-ROADMAP.md` for full phase details, success crit
 - [x] **Phase 36: Dual-Voice Data Layer** - Script key voice classification + env configuration + version context types (completed 2026-05-09)
 - [x] **Phase 37: Dual-Voice Service Layer** - TTS/FallbackTTS dual-voice support + API route voice ID routing (completed 2026-05-09)
 - [x] **Phase 38: Version Selector & UI Integration** - Home page V1/V2 selector + OracleExperience version-aware audio routing (completed 2026-05-09)
-- [ ] **Phase 39: Audio Generation & Polish** - Generate V2 narrative MP3s + fix "faça" in ENCERRAMENTO (both versions)
+- [ ] **Phase 39: Audio Generation & Polish** - Generate V2 narrative MP3s + fix "faca" in ENCERRAMENTO (both versions)
 
 ## Phase Details
 
@@ -184,16 +184,20 @@ Plans:
 - [x] 38-02-PLAN.md — V1 regression tests + V2 selection flow verification + full suite regression check
 
 ### Phase 39: Audio Generation & Polish
-**Goal**: All V2 narrative MP3s generated with somber voice plus "faça" fix applied to both versions
+**Goal**: All V2 narrative MP3s generated with somber voice plus "faca" fix applied to both versions
 **Depends on**: Phase 36 (voice classification metadata exists)
 **Requirements**: AUD-01, AUD-02, AUD-03
 **Success Criteria** (what must be TRUE):
   1. Script generation tool (generate-audio-v3.ts) supports dual-voice mode with voice ID per segment type
   2. All narrative segments have MP3s generated with somber voice in public/audio/prerecorded/v2/
-  3. ENCERRAMENTO script key updated from "faz" to "faça" and MP3 regenerated for both V1 and V2
+  3. ENCERRAMENTO script key updated from "faz" to "faca" and MP3 regenerated for both V1 and V2
   4. Total MP3 count increases to accommodate V2 narrative files (approximately 82 V1 files + ~50 V2 narrative files)
   5. FallbackTTS coverage verified for both versions with correct directory paths
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 39-01-PLAN.md — Env var fix + generation script --v2 dual-voice extension + script.ts "faca" commit
+- [ ] 39-02-PLAN.md — Generate 47 V2 narrative MP3s + regenerate ENCERRAMENTO V1 + coverage verification
 
 ---
 
@@ -231,7 +235,7 @@ Plans:
 **Requirements**: TSTV3-01, TSTV3-02, TSTV3-03
 **Status**: Skipped for v4.0 pivot — testing will be done in Phase 29
 **Success Criteria**:
-  1. Machine tests cover all 6 choices, pattern tracking, devolução routing
+  1. Machine tests cover all 6 choices, pattern tracking, devolucao routing
   2. Component tests verify script key mapping
   3. All tests pass (no regressions)
 
@@ -314,7 +318,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. OracleExperience component handles conditional branching UI states
   2. useVoiceChoice hook updated for variable-length choice sequences
-  3. All machine tests pass (branching transitions, pattern tracking, devolução routing)
+  3. All machine tests pass (branching transitions, pattern tracking, devolucao routing)
   4. All component tests pass (script key mapping, UI state rendering)
   5. Manual browser verification confirms 5-7 min experience with branching
 **UI hint**: yes
@@ -351,7 +355,7 @@ Plans:
 **UI hint**: no
 
 ### Phase 32: Q5B Branch (Paraiso gap closure)
-**Goal**: Add "O Que Já Não Cabe" branch — triggered when q4=A && q5=A (PORTADOR profile precursor), addresses the gap that no Paraíso branch exists despite Inferno (Q2B) and Purgatorio (Q4B) having one each. Adds 6 SCRIPT keys, QUESTION_META[10], shouldBranchQ5B guard, 6 machine states with sibling-state rejoin to Q6_SETUP, OracleExperience helper extensions, 6 MP3s, timing validation expansion to 12 paths, and roteiro.html documentation. Mirrors Phase 31 (Q1B) structure with two key differences: (1) sibling-state rejoin pattern (no #oracle. prefix because Q5B and Q6_SETUP both live inside PARAISO compound state), (2) Q5B is COEXISTENT with Q4B (both fire when q3=A, q4=A, q5=A — not mutually exclusive). PORTADOR archetype detection deliberately deferred to Phase 34 to honor POL-02 invariant (patternMatching.ts byte-identical).
+**Goal**: Add "O Que Ja Nao Cabe" branch — triggered when q4=A && q5=A (PORTADOR profile precursor), addresses the gap that no Paraiso branch exists despite Inferno (Q2B) and Purgatorio (Q4B) having one each. Adds 6 SCRIPT keys, QUESTION_META[10], shouldBranchQ5B guard, 6 machine states with sibling-state rejoin to Q6_SETUP, OracleExperience helper extensions, 6 MP3s, timing validation expansion to 12 paths, and roteiro.html documentation. Mirrors Phase 31 (Q1B) structure with two key differences: (1) sibling-state rejoin pattern (no #oracle. prefix because Q5B and Q6_SETUP both live inside PARAISO compound state), (2) Q5B is COEXISTENT with Q4B (both fire when q3=A, q4=A, q5=A — not mutually exclusive). PORTADOR archetype detection deliberately deferred to Phase 34 to honor POL-02 invariant (patternMatching.ts byte-identical).
 **Depends on**: Phase 31
 **Requirements**: BR-02
 **Plans:** 3/3 plans complete
@@ -364,7 +368,7 @@ Plans:
 **UI hint**: no
 
 ### Phase 33: Q6B + ESPELHO_SILENCIOSO
-**Goal**: Add "O Espelho Extra" branch — triggered when q5=B && q6=A (visitor dissolveu a pergunta MAS pediu leitura) — plus the new DEVOLUCAO_ESPELHO_SILENCIOSO archetype that returns open structure instead of closed diagnosis. Adds 6 Q6B SCRIPT keys + 1 DEVOLUCAO_ESPELHO_SILENCIOSO SCRIPT key (6 segments in 1 MP3), QUESTION_META[11], shouldBranchQ6B guard + isEspelhoSilencioso guard (both in oracleMachine.ts setup.guards, NOT in patternMatching.ts — POL-02 invariant), 6 new Q6B machine states with QUALIFIED `#oracle.DEVOLUCAO` rejoin (different from Phase 32's sibling pattern because DEVOLUCAO lives at machine root), DEVOLUCAO.always[0] insertion (HIGHEST priority — ahead of all 8 existing archetypes), new top-level DEVOLUCAO_ESPELHO_SILENCIOSO state, OracleExperience Q6B_CHOICE + 6 helper extensions (including isPergunta mic warmup fix), 7 MP3s generated via generate-audio-v3.ts auto-discovery, validate-timing.ts expansion from 12 → 20 paths with hasQ6B/hasEspelhoSilencioso flags and pickLongestDevolucao update, and public/roteiro.html updates (Mermaid Q6B branch + ESPELHO archetype + ramificações count 3).
+**Goal**: Add "O Espelho Extra" branch — triggered when q5=B && q6=A (visitor dissolveu a pergunta MAS pediu leitura) — plus the new DEVOLUCAO_ESPELHO_SILENCIOSO archetype that returns open structure instead of closed diagnosis. Adds 6 Q6B SCRIPT keys + 1 DEVOLUCAO_ESPELHO_SILENCIOSO SCRIPT key (6 segments in 1 MP3), QUESTION_META[11], shouldBranchQ6B guard + isEspelhoSilencioso guard (both in oracleMachine.ts setup.guards, NOT in patternMatching.ts — POL-02 invariant), 6 new Q6B machine states with QUALIFIED `#oracle.DEVOLUCAO` rejoin (different from Phase 32's sibling pattern because DEVOLUCAO lives at machine root), DEVOLUCAO.always[0] insertion (HIGHEST priority — ahead of all 8 existing archetypes), new top-level DEVOLUCAO_ESPELHO_SILENCIOSO state, OracleExperience Q6B_CHOICE + 6 helper extensions (including isPergunta mic warmup fix), 7 MP3s generated via generate-audio-v3.ts auto-discovery, validate-timing.ts expansion from 12 → 20 paths with hasQ6B/hasEspelhoSilencioso flags and pickLongestDevolucao update, and public/roteiro.html updates (Mermaid Q6B branch + ESPELHO archetype + ramificacoes count 3).
 **Depends on**: Phase 32
 **Requirements**: BR-03, AR-01
 **Plans:** 3/3 plans complete
@@ -385,7 +389,7 @@ Plans:
 Plans:
 - [x] 34-01-PLAN.md — Data + Types: DevolucaoArchetype union extension (+ ESPELHO_SILENCIOSO backfill) + DEVOLUCAO_CONTRA_FOBICO and DEVOLUCAO_PORTADOR SCRIPT keys with drafted segment text (Wave 1)
 - [x] 34-02-PLAN.md — Guards + Machine + UI + Tests: isContraFobico/isPortador guards, oracleMachine setup.guards + DEVOLUCAO.always insertion + 2 new top-level states, OracleExperience getScriptKey extensions, TDD across 3 suites (Wave 2, depends on 34-01)
-- [x] 34-03-PLAN.md — Audio + Timing + Roteiro: generate 2 MP3s via ElevenLabs v3, extend validate-timing.ts (24 paths, trigger-aware pickLongestDevolucao), fix fallback-tts SCRIPT count (80→82), update roteiro.html with 2 new cards + 11-archetype priority list (Wave 3, depends on 34-02)
+- [x] 34-03-PLAN.md — Audio + Timing + Roteiro: generate 2 MP3s via ElevenLabs v3, extend validate-timing.ts (24 paths, trigger-aware pickLongestDevolucao), fix fallback-tts SCRIPT count (80->82), update roteiro.html with 2 new cards + 11-archetype priority list (Wave 3, depends on 34-02)
 
 **UI hint**: no
 
@@ -423,7 +427,7 @@ Plans:
 | 36. Dual-Voice Data Layer | v6.1 | 2/2 | Complete    | 2026-05-09 |
 | 37. Dual-Voice Service Layer | v6.1 | 2/2 | Complete    | 2026-05-09 |
 | 38. Version Selector & UI Integration | v6.1 | 2/2 | Complete    | 2026-05-09 |
-| 39. Audio Generation & Polish | v6.1 | 0/TBD | Not started | - |
+| 39. Audio Generation & Polish | v6.1 | 0/2 | Not started | - |
 
 ## Dependencies
 
@@ -437,4 +441,4 @@ v6.1 Duas Vozes (active):
 
 ---
 
-*Last updated: 2026-05-09 -- Phase 38 planned (2 plans: version selector component + regression tests)*
+*Last updated: 2026-05-09 -- Phase 39 planned (2 plans: script extension + audio generation)*

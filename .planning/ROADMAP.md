@@ -422,7 +422,7 @@ Plans:
 | 35. Timing + UAT | v6.0 | 3/3 | Complete    | 2026-04-08 |
 | 36. Dual-Voice Data Layer | v6.1 | 2/2 | Complete    | 2026-05-09 |
 | 37. Dual-Voice Service Layer | v6.1 | 2/2 | Complete    | 2026-05-09 |
-| 38. Version Selector & UI Integration | v6.1 | 0/2 | Not started | - |
+| 38. Version Selector & UI Integration | v6.1 | 0/2 | Planned | - |
 | 39. Audio Generation & Polish | v6.1 | 0/TBD | Not started | - |
 
 ## Dependencies

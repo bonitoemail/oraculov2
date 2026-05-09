@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v6.1
 milestone_name: Duas Vozes
 status: in-progress
-last_updated: "2026-05-09T11:22:06.000Z"
+last_updated: "2026-05-09T11:32:41.000Z"
 last_activity: 2026-05-09
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
   percent: 50
 ---
 
@@ -25,12 +25,12 @@ progress:
 
 ## Current Position
 
-Phase: 37 of 39 (Dual-Voice Service Layer) -- EXECUTING
-Plan: 1 of 2 in current phase (wave 1 complete, wave 2 pending)
-Status: Phase 37 executing (plan 01 complete, plan 02 pending)
-Last activity: 2026-05-09 — Plan 37-01 complete (TTSService interface + API route voice routing)
+Phase: 37 of 39 (Dual-Voice Service Layer) -- COMPLETE
+Plan: 2 of 2 in current phase (all plans complete)
+Status: Phase 37 complete, ready for Phase 38
+Last activity: 2026-05-09 — Plan 37-02 complete (client-side TTS voice routing)
 
-Progress: [█████████████████████████████████████░░] 92% (36/39 phases complete)
+Progress: [█████████████████████████████████████░░] 95% (37/39 phases complete)
 
 ## Performance Metrics
 
@@ -62,6 +62,8 @@ Progress: [███████████████████████
 
 Recent decisions affecting current work:
 
+- [v6.1]: FallbackTTS uses version + voiceType (not voiceId) for directory routing -- avoids client-side env var exposure (Plan 37-02)
+- [v6.1]: Versioned cache keys prevent cross-version AudioBuffer contamination in FallbackTTS (Plan 37-02)
 - [v6.1]: Voice ID resolved server-side in API route (not client-side) — keeps ELEVENLABS_VOICE_ID_V2 server-only, consistent with existing env var convention (Plan 37-01)
 - [v6.1]: React Context for version (not prop drilling or machine context) — natural fit for component tree config (Plan 36-02)
 - [v6.1]: V1 as default with no initialVersion in page.tsx — zero regression guaranteed (Plan 36-02)
@@ -95,5 +97,5 @@ Items carried forward from previous milestones:
 ## Session Continuity
 
 Last session: 2026-05-09
-Stopped at: Completed 37-01-PLAN.md (TTS interface + API route voice routing)
-Resume: Plan 37-02 — FallbackTTS + ElevenLabs client voice routing (wave 2)
+Stopped at: Completed 37-02-PLAN.md (client-side TTS voice routing + dual-directory + tests)
+Resume: Phase 38 — Version Selector & UI Integration

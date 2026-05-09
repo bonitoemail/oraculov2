@@ -18,8 +18,8 @@ Requirements for **Duas Vozes** milestone. Criar versão V2 da experiência com 
 - [x] **VOZ-01**: Cada script key é classificado como VOZ_PERGUNTA ou VOZ_NARRATIVA (metadata no script ou mapeamento separado) — *Phase 36, Plan 01*
 - [x] **VOZ-02**: Nova env `ELEVENLABS_VOICE_ID_V2` configura a voz soturna (server-side only) — *Phase 36, Plan 01*
 - [x] **VOZ-03**: API route `/api/tts` aceita parâmetro de voice ID (V1 vs V2) baseado na versão e tipo de segmento — *Phase 37, Plan 01*
-- [ ] **VOZ-04**: FallbackTTS na V2 busca MP3 narrativos em `public/audio/prerecorded/v2/`, perguntas continuam na raiz
-- [ ] **VOZ-05**: Na V2, segmentos PERGUNTA usam Voz 1 (atual) e segmentos narrativos usam Voz 2 (soturna)
+- [x] **VOZ-04**: FallbackTTS na V2 busca MP3 narrativos em `public/audio/prerecorded/v2/`, perguntas continuam na raiz -- *Phase 37, Plan 02*
+- [x] **VOZ-05**: Na V2, segmentos PERGUNTA usam Voz 1 (atual) e segmentos narrativos usam Voz 2 (soturna) -- *Phase 37, Plan 02*
 
 ### Audio
 
@@ -74,8 +74,8 @@ All 10 requirements satisfied (BR-01 through UAT-01). 5 conditional branches (Q1
 | VOZ-01 | Phase 36 | Complete (Plan 01) |
 | VOZ-02 | Phase 36 | Complete (Plan 01) |
 | VOZ-03 | Phase 37 | Complete (Plan 01) |
-| VOZ-04 | Phase 37 | Pending |
-| VOZ-05 | Phase 37 | Pending |
+| VOZ-04 | Phase 37 | Complete (Plan 02) |
+| VOZ-05 | Phase 37 | Complete (Plan 02) |
 | AUD-01 | Phase 39 | Pending |
 | AUD-02 | Phase 39 | Pending |
 | AUD-03 | Phase 39 | Pending |
@@ -93,4 +93,4 @@ All 10 requirements satisfied (BR-01 through UAT-01). 5 conditional branches (Q1
 
 ---
 *Requirements defined: 2026-05-08*
-*Last updated: 2026-05-09 — VOZ-03 completed in Plan 37-01*
+*Last updated: 2026-05-09 — VOZ-04, VOZ-05 completed in Plan 37-02*

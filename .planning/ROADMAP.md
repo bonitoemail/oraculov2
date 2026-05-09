@@ -165,7 +165,7 @@ Plans:
 
 Plans:
 - [x] 37-01-PLAN.md — TTSService interface extension + API route server-side voice ID resolution + tests
-- [ ] 37-02-PLAN.md — ElevenLabsTTS + FallbackTTS + useTTSOrchestrator + OracleExperience dual-voice wiring + tests
+- [x] 37-02-PLAN.md — ElevenLabsTTS + FallbackTTS + useTTSOrchestrator + OracleExperience dual-voice wiring + tests
 
 ### Phase 38: Version Selector & UI Integration
 **Goal**: Users can choose V1 or V2 at start and experience version-specific audio routing
@@ -418,7 +418,7 @@ Plans:
 | 34. Detectable Archetypes | v6.0 | 3/3 | Complete    | 2026-04-08 |
 | 35. Timing + UAT | v6.0 | 3/3 | Complete    | 2026-04-08 |
 | 36. Dual-Voice Data Layer | v6.1 | 2/2 | Complete    | 2026-05-09 |
-| 37. Dual-Voice Service Layer | v6.1 | 1/2 | In Progress | - |
+| 37. Dual-Voice Service Layer | v6.1 | 2/2 | Complete    | 2026-05-09 |
 | 38. Version Selector & UI Integration | v6.1 | 0/TBD | Not started | - |
 | 39. Audio Generation & Polish | v6.1 | 0/TBD | Not started | - |
 
@@ -434,4 +434,4 @@ v6.1 Duas Vozes (active):
 
 ---
 
-*Last updated: 2026-05-09 -- Plan 37-01 complete (TTSService interface + API route voice routing)*
+*Last updated: 2026-05-09 -- Phase 37 complete (dual-voice service layer: interface + API route + client-side TTS routing)*

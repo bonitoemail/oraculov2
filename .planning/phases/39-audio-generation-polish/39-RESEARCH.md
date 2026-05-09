@@ -304,17 +304,17 @@ private getPrerecordedUrl(
 | A2 | The voice ID GIuLCSVfgJaUuh7hYOY8 in .env.local is the intended somber voice for V2 | Key Data Points | If wrong voice ID, all 47 V2 MP3s would need regeneration |
 | A3 | ~16 MB for V2 narrative MP3s is acceptable for browser loading | Key Data Points | If too large, may need lazy loading or compression -- but V1 is already 21 MB and works fine |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Voice settings tuning for V2 somber voice**
    - What we know: Same PHASE_VOICE settings work for V1 Oracle voice. V2 voice character comes primarily from the voice ID itself.
    - What's unclear: Whether the somber voice clone responds optimally to the same stability/similarity_boost/style values
-   - Recommendation: Generate with same settings first. If quality is unsatisfactory, create V2-specific settings as a separate tuning pass.
+   - RESOLVED: Generate with same settings first. Voice character comes from the voice ID, not settings. Tuning is a separate post-generation pass if needed.
 
 2. **ENCERRAMENTO scope for V2**
    - What we know: ENCERRAMENTO is classified as VOZ_PERGUNTA. In V2, VOZ_PERGUNTA segments use V1 voice. FallbackTTS serves V1 root MP3 for both versions.
    - What's unclear: Whether the client explicitly asked for ENCERRAMENTO to be somber-voiced in V2 or if pergunta-classification (original voice) is intentional
-   - Recommendation: Keep ENCERRAMENTO as VOZ_PERGUNTA per existing classification. The "faca" fix applies to the shared V1 MP3 only. This is consistent with the architecture: the Oracle's closing words use the familiar voice, not the somber narrator.
+   - RESOLVED: Keep ENCERRAMENTO as VOZ_PERGUNTA per existing classification. The "faca" fix applies to the shared V1 MP3 only. V1 MP3 is shared for both versions. The Oracle's closing words use the familiar voice, not the somber narrator.
 
 ## Environment Availability
 

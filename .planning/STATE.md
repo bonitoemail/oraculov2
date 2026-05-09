@@ -21,7 +21,7 @@ progress:
 
 **Current Milestone:** v6.1 Duas Vozes
 
-**Current Focus:** Phase 36 — Dual-Voice Data Layer
+**Current Focus:** Phase 37 — Dual-Voice Service Layer
 
 ## Current Position
 

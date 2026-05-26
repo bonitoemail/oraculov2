@@ -89,7 +89,7 @@ export default function StartButton({ onClick }: StartButtonProps) {
         >
           <Image
             src="/images/oraculogo.png"
-            alt="Oraculo"
+            alt="Oráculo"
             width={420}
             height={160}
             priority
@@ -103,7 +103,7 @@ export default function StartButton({ onClick }: StartButtonProps) {
 
         {/* Subtitle — fades in with slight upward drift */}
         <p
-          className="mt-2 tracking-widest uppercase"
+          className="-mt-3 tracking-widest uppercase"
           style={{
             fontFamily: 'var(--font-cormorant), Georgia, serif',
             fontSize: '0.7rem',
@@ -115,12 +115,52 @@ export default function StartButton({ onClick }: StartButtonProps) {
             transition: 'opacity 1.2s ease-out, transform 1.2s ease-out',
           }}
         >
-          experiencia interativa de voz
+          uma experiência interativa por voz
         </p>
+
+        {/* Instructions — staggered line-by-line entrance */}
+        <div className="mt-14 flex flex-col items-center gap-5">
+          {[
+            { text: 'Coloque os fones de ouvido.', delay: 0.3, icon: '○' },
+            { text: 'Uma experiência curta, guiada por voz.', delay: 0.6, icon: '○' },
+            { text: 'Diversos finais possíveis.', delay: 0.9, icon: '○' },
+          ].map((line, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3"
+              style={{
+                opacity: phase === 'ready' ? 1 : 0,
+                transform: phase === 'ready' ? 'translateY(0)' : 'translateY(10px)',
+                transition: `opacity 1s ease-out ${line.delay}s, transform 1s ease-out ${line.delay}s`,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: '0.35rem',
+                  color: 'rgba(200, 80, 60, 0.4)',
+                  animation: phase === 'ready' ? `start-breathe 4s ease-in-out ${i * 1.3}s infinite` : 'none',
+                }}
+              >
+                {line.icon}
+              </span>
+              <span
+                style={{
+                  fontFamily: 'var(--font-cormorant), Georgia, serif',
+                  fontSize: '0.85rem',
+                  fontWeight: 300,
+                  color: 'rgba(255, 255, 255, 0.32)',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                {line.text}
+              </span>
+            </div>
+          ))}
+        </div>
 
         {/* Animated separator line */}
         <div
-          className="mx-auto mt-10 mb-10"
+          className="mx-auto mt-9 mb-9"
           style={{
             height: '1px',
             background: 'rgba(255, 255, 255, 0.12)',
@@ -151,7 +191,7 @@ export default function StartButton({ onClick }: StartButtonProps) {
           }}
         >
           <span className="relative z-10 group-hover:text-white/80 group-hover:tracking-[0.22em] transition-all duration-700">
-            Entrar
+            Iniciar
           </span>
           <div
             className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"
@@ -172,7 +212,7 @@ export default function StartButton({ onClick }: StartButtonProps) {
             transition: 'opacity 2s ease-out 0.5s',
           }}
         >
-          VII Bienal de Psicanalise e Cultura &middot; SBPRP 2026
+          VII Bienal de Psicanálise e Cultura &middot; SBPRP 2026
         </p>
       </div>
     </div>

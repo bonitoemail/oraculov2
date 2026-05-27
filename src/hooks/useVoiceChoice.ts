@@ -66,7 +66,7 @@ export interface UseVoiceChoiceReturn {
 
 const MAX_ATTEMPTS_DEFAULT = 2;
 const CONFIDENCE_THRESHOLD_DEFAULT = 0.7;
-const LISTENING_DURATION_DEFAULT = 4000;
+const LISTENING_DURATION_DEFAULT = 6000;
 
 const logger = createLogger('VoiceChoice');
 
@@ -182,6 +182,7 @@ export function useVoiceChoice(config: ChoiceConfig, active: boolean): UseVoiceC
   const reset = useCallback(() => {
     logger.log('reset');
     dispatch({ type: 'RESET' });
+    processingRef.current = false;
     setError(null);
   }, []);
 
@@ -233,9 +234,19 @@ export function useVoiceChoice(config: ChoiceConfig, active: boolean): UseVoiceC
     dispatch({ type: 'AUDIO_READY', blob: audioBlob });
   }, [audioBlob, lifecycle.phase]);
 
+  // Guard against React Strict Mode double-invocation of processing effect
+  const processingRef = useRef(false);
+
   // Process audio when in processing phase
   useEffect(() => {
     if (lifecycle.phase !== 'processing') return;
+
+    // Strict Mode guard: prevent duplicate API calls
+    if (processingRef.current) {
+      logger.log('Processing already in flight — skipping duplicate');
+      return;
+    }
+    processingRef.current = true;
 
     const { blob, attempt: currentAttempt } = lifecycle;
 
@@ -245,6 +256,7 @@ export function useVoiceChoice(config: ChoiceConfig, active: boolean): UseVoiceC
     // Guard: don't process with invalid/dummy config
     if (!snap.options.A || !snap.options.B) {
       logger.log('Ignoring audioBlob — config has empty options');
+      processingRef.current = false;
       return;
     }
 
@@ -359,7 +371,9 @@ export function useVoiceChoice(config: ChoiceConfig, active: boolean): UseVoiceC
       }
     }
 
-    processAudio();
+    processAudio().finally(() => {
+      processingRef.current = false;
+    });
 
     return () => {
       cancelled = true;

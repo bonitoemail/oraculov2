@@ -63,7 +63,7 @@ export function useMicrophone(): UseMicrophoneReturn {
     logger.log('warmUp — requesting getUserMedia');
     navigator.mediaDevices.getUserMedia({
       audio: {
-        echoCancellation: true,
+        echoCancellation: false,
         noiseSuppression: true,
         sampleRate: 44100,
       },
@@ -118,7 +118,7 @@ export function useMicrophone(): UseMicrophoneReturn {
       } else {
         stream = await navigator.mediaDevices.getUserMedia({
           audio: {
-            echoCancellation: true,
+            echoCancellation: false,
             noiseSuppression: true,
             sampleRate: 44100,
           },

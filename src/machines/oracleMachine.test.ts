@@ -389,7 +389,7 @@ describe('oracleMachine v4', () => {
       actor.send({ type: 'NARRATIVA_DONE' }); // -> Q2B_PERGUNTA
       actor.send({ type: 'NARRATIVA_DONE' }); // -> Q2B_AGUARDANDO
 
-      vi.advanceTimersByTime(25000);
+      vi.advanceTimersByTime(35000);
       expect(actor.getSnapshot().value).toEqual({ INFERNO: 'Q2B_TIMEOUT' });
       expect(actor.getSnapshot().context.choiceMap.q2b).toBe('A');
 
@@ -535,7 +535,7 @@ describe('oracleMachine v4', () => {
       actor.send({ type: 'NARRATIVA_DONE' }); // -> Q4B_PERGUNTA
       actor.send({ type: 'NARRATIVA_DONE' }); // -> Q4B_AGUARDANDO
 
-      vi.advanceTimersByTime(25000);
+      vi.advanceTimersByTime(35000);
       expect(actor.getSnapshot().value).toEqual({ PURGATORIO: 'Q4B_TIMEOUT' });
       expect(actor.getSnapshot().context.choiceMap.q4b).toBe('A');
 
@@ -770,7 +770,7 @@ describe('oracleMachine v4', () => {
       const actor = createActor(oracleMachine).start();
       advanceToQ1Aguardando(actor);
 
-      vi.advanceTimersByTime(25000);
+      vi.advanceTimersByTime(35000);
       expect(actor.getSnapshot().value).toEqual({ INFERNO: 'Q1_TIMEOUT' });
       expect(actor.getSnapshot().context.choices[0]).toBe('A');
       expect(actor.getSnapshot().context.choiceMap.q1).toBe('A');
@@ -784,7 +784,7 @@ describe('oracleMachine v4', () => {
       const actor = createActor(oracleMachine).start();
       advanceToQ6Aguardando(actor);
 
-      vi.advanceTimersByTime(25000);
+      vi.advanceTimersByTime(35000);
       expect(actor.getSnapshot().value).toEqual({ PARAISO: 'Q6_TIMEOUT' });
       // Q6 default is B. In non-branching path: choices[5]=B
       expect(actor.getSnapshot().context.choices[5]).toBe('B');
@@ -799,7 +799,7 @@ describe('oracleMachine v4', () => {
       const actor = createActor(oracleMachine).start();
       advanceToQ2Aguardando(actor);
 
-      vi.advanceTimersByTime(25000);
+      vi.advanceTimersByTime(35000);
       expect(actor.getSnapshot().context.choices[1]).toBe('A');
       expect(actor.getSnapshot().context.choiceMap.q2).toBe('A');
       actor.stop();
@@ -813,7 +813,7 @@ describe('oracleMachine v4', () => {
       actor.send({ type: 'NARRATIVA_DONE' }); // -> Q2B_PERGUNTA
       actor.send({ type: 'NARRATIVA_DONE' }); // -> Q2B_AGUARDANDO
 
-      vi.advanceTimersByTime(25000);
+      vi.advanceTimersByTime(35000);
       expect(actor.getSnapshot().value).toEqual({ INFERNO: 'Q2B_TIMEOUT' });
       expect(actor.getSnapshot().context.choiceMap.q2b).toBe('A');
       // choices array should have q2b at index 2 (after q1=A at 0, q2=A at 1)
@@ -839,7 +839,7 @@ describe('oracleMachine v4', () => {
       actor.send({ type: 'NARRATIVA_DONE' }); // -> Q4B_PERGUNTA
       actor.send({ type: 'NARRATIVA_DONE' }); // -> Q4B_AGUARDANDO
 
-      vi.advanceTimersByTime(25000);
+      vi.advanceTimersByTime(35000);
       expect(actor.getSnapshot().value).toEqual({ PURGATORIO: 'Q4B_TIMEOUT' });
       expect(actor.getSnapshot().context.choiceMap.q4b).toBe('A');
       actor.stop();
@@ -849,7 +849,7 @@ describe('oracleMachine v4', () => {
       const actor = createActor(oracleMachine).start();
       advanceToQ1Aguardando(actor);
 
-      vi.advanceTimersByTime(25000); // Q1 timeout -> A
+      vi.advanceTimersByTime(35000); // Q1 timeout -> A
       const ctx = actor.getSnapshot().context;
       expect(ctx.choices).toEqual(['A']);
       expect(ctx.choiceMap.q1).toBe('A');
@@ -1176,7 +1176,7 @@ describe('oracleMachine v4', () => {
       actor.send({ type: 'NARRATIVA_DONE' });
       actor.send({ type: 'NARRATIVA_DONE' });
       actor.send({ type: 'NARRATIVA_DONE' });
-      vi.advanceTimersByTime(25000);
+      vi.advanceTimersByTime(35000);
       expect(actor.getSnapshot().matches({ INFERNO: 'Q1B_TIMEOUT' })).toBe(true);
       expect(actor.getSnapshot().context.choiceMap.q1b).toBe('A');
       actor.stop();
@@ -1189,7 +1189,7 @@ describe('oracleMachine v4', () => {
       actor.send({ type: 'NARRATIVA_DONE' });
       actor.send({ type: 'NARRATIVA_DONE' });
       actor.send({ type: 'NARRATIVA_DONE' });
-      vi.advanceTimersByTime(25000);
+      vi.advanceTimersByTime(35000);
       actor.send({ type: 'NARRATIVA_DONE' });
       expect(actor.getSnapshot().matches({ INFERNO: 'Q1B_RESPOSTA_A' })).toBe(true);
       actor.stop();
@@ -1387,7 +1387,7 @@ describe('oracleMachine v4', () => {
       actor.send({ type: 'NARRATIVA_DONE' });
       actor.send({ type: 'NARRATIVA_DONE' });
       actor.send({ type: 'NARRATIVA_DONE' });
-      vi.advanceTimersByTime(25000);
+      vi.advanceTimersByTime(35000);
       expect(actor.getSnapshot().matches({ PARAISO: 'Q5B_TIMEOUT' })).toBe(true);
       expect(actor.getSnapshot().context.choiceMap.q5b).toBe('A');
       vi.useRealTimers();
@@ -1403,7 +1403,7 @@ describe('oracleMachine v4', () => {
       actor.send({ type: 'NARRATIVA_DONE' });
       actor.send({ type: 'NARRATIVA_DONE' });
       actor.send({ type: 'NARRATIVA_DONE' });
-      vi.advanceTimersByTime(25000);
+      vi.advanceTimersByTime(35000);
       vi.useRealTimers();
       actor.send({ type: 'NARRATIVA_DONE' });
       expect(actor.getSnapshot().matches({ PARAISO: 'Q5B_RESPOSTA_A' })).toBe(true);
@@ -1895,8 +1895,8 @@ describe('oracleMachine v4', () => {
       // Now at Q6_AGUARDANDO — DO NOT send CHOICE_A/B, let it timeout
       expect(actor.getSnapshot().matches({ PARAISO: 'Q6_AGUARDANDO' })).toBe(true);
 
-      // Advance 25001ms → timeout fires, records q6='B', goes to Q6_TIMEOUT
-      vi.advanceTimersByTime(25001);
+      // Advance 35001ms → timeout fires, records q6='B', goes to Q6_TIMEOUT
+      vi.advanceTimersByTime(35001);
       expect(actor.getSnapshot().matches({ PARAISO: 'Q6_TIMEOUT' })).toBe(true);
       expect(actor.getSnapshot().context.choiceMap.q6).toBe('B');
 
@@ -1982,7 +1982,7 @@ describe('oracleMachine v4', () => {
       actor.send({ type: 'NARRATIVA_DONE' }); // → Q6B_AGUARDANDO
 
       // Timeout after 25s → Q6B_TIMEOUT with q6b='A'
-      vi.advanceTimersByTime(25001);
+      vi.advanceTimersByTime(35001);
       expect(actor.getSnapshot().matches({ PARAISO: 'Q6B_TIMEOUT' })).toBe(true);
       expect(actor.getSnapshot().context.choiceMap.q6b).toBe('A');
 

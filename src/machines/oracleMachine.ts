@@ -137,7 +137,7 @@ export const oracleMachine = setup({
         },
         Q1_AGUARDANDO: {
           after: {
-            25000: {
+            35000: {
               target: 'Q1_TIMEOUT',
               actions: assign(recordChoice('q1', 'A')),
             },
@@ -180,7 +180,7 @@ export const oracleMachine = setup({
         },
         Q2_AGUARDANDO: {
           after: {
-            25000: {
+            35000: {
               target: 'Q2_TIMEOUT',
               actions: assign(recordChoice('q2', 'A')),
             },
@@ -230,7 +230,7 @@ export const oracleMachine = setup({
         },
         Q2B_AGUARDANDO: {
           after: {
-            25000: {
+            35000: {
               target: 'Q2B_TIMEOUT',
               actions: assign(recordChoice('q2b', 'A')),
             },
@@ -276,7 +276,7 @@ export const oracleMachine = setup({
         },
         Q1B_AGUARDANDO: {
           after: {
-            25000: {
+            35000: {
               target: 'Q1B_TIMEOUT',
               actions: assign(recordChoice('q1b', 'A')),
             },
@@ -344,7 +344,7 @@ export const oracleMachine = setup({
         },
         Q3_AGUARDANDO: {
           after: {
-            25000: {
+            35000: {
               target: 'Q3_TIMEOUT',
               actions: assign(recordChoice('q3', 'A')),
             },
@@ -387,7 +387,7 @@ export const oracleMachine = setup({
         },
         Q4_AGUARDANDO: {
           after: {
-            25000: {
+            35000: {
               target: 'Q4_TIMEOUT',
               actions: assign(recordChoice('q4', 'A')),
             },
@@ -434,7 +434,7 @@ export const oracleMachine = setup({
         },
         Q4B_AGUARDANDO: {
           after: {
-            25000: {
+            35000: {
               target: 'Q4B_TIMEOUT',
               actions: assign(recordChoice('q4b', 'A')),
             },
@@ -502,7 +502,7 @@ export const oracleMachine = setup({
         },
         Q5_AGUARDANDO: {
           after: {
-            25000: {
+            35000: {
               target: 'Q5_TIMEOUT',
               actions: assign(recordChoice('q5', 'A')),
             },
@@ -548,7 +548,7 @@ export const oracleMachine = setup({
         },
         Q6_AGUARDANDO: {
           after: {
-            25000: {
+            35000: {
               target: 'Q6_TIMEOUT',
               actions: assign(recordChoice('q6', 'B')),
             },
@@ -593,7 +593,7 @@ export const oracleMachine = setup({
         },
         Q6B_AGUARDANDO: {
           after: {
-            25000: {
+            35000: {
               target: 'Q6B_TIMEOUT',
               // DEFAULT 'A' on silence — silence MUST NEVER fire ESPELHO_SILENCIOSO.
               actions: assign(recordChoice('q6b', 'A')),
@@ -637,7 +637,7 @@ export const oracleMachine = setup({
         },
         Q5B_AGUARDANDO: {
           after: {
-            25000: {
+            35000: {
               target: 'Q5B_TIMEOUT',
               actions: assign(recordChoice('q5b', 'A')),
             },

@@ -135,7 +135,7 @@ describe('Voice Flow Integration', () => {
       expect(actor.getSnapshot().matches({ INFERNO: 'AGUARDANDO' })).toBe(true);
 
       // Advance time by 25 seconds (XState timer in AGUARDANDO)
-      vi.advanceTimersByTime(25000);
+      vi.advanceTimersByTime(35000);
 
       // Machine should transition to TIMEOUT_REDIRECT
       let currentState = actor.getSnapshot();

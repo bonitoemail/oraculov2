@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     // Set up 10-second timeout to prevent stuck states
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
 
     try {
       // Call OpenAI Whisper API

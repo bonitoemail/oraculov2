@@ -6,6 +6,21 @@ Interactive voice art installation for the VII Bienal de Psicanalise e Cultura (
 
 **Status:** v6.1 in progress. Start screen redesigned with logo + ambient effects. V1 only (VersionSelector removed from flow). Pending: V2 audio generation (Phase 39-02) + browser UAT + event deploy.
 
+## Pending Task: Regenerate MP3s at 1.15x Speed
+
+**Goal:** Restore the 1.15x playback speed by baking it into the MP3s at generation time, avoiding the HTMLAudioElement approach that breaks mobile.
+
+**Plan:**
+1. Add `--speed 1.15` flag to `scripts/generate-audio-v3.ts` — passes `speed: 1.15` in the ElevenLabs API `voice_settings` body (eleven_v3 model supports `speed` param 0.7-1.2 range, 1.15 is within range)
+2. Generate new MP3s to `public/audio/prerecorded-1.15x/` first (preserve originals)
+3. Listen/compare a few key samples (APRESENTACAO_INTRO, INFERNO_INTRO, a DEVOLUCAO)
+4. If good, replace `public/audio/prerecorded/` with the 1.15x versions
+5. Re-run `scripts/validate-timing.ts` to confirm all 24 branch paths still fit under 7:30 budget (should be ~13% shorter)
+6. No code changes needed — AudioBufferSourceNode plays at 1.0x, the speed is baked into the MP3
+
+**Important:** ElevenLabs `speed` param range is 0.7-1.2 per their docs. 1.15 is near the upper limit. Test quality before bulk generating.
+**Cost:** ~82 API calls × ~$0.015 each ≈ $1.23 (well within budget)
+
 ## Stack
 
 - **Next.js 15** App Router (API routes as server-side proxies)
@@ -172,7 +187,7 @@ public/images/oraculogo.png    # Hand-painted logo (used on start screen)
 
 - **AudioBufferSourceNode** is the ONLY reliable playback method on mobile. Use `source.connect(effectsInput)` + `source.start()`.
 - **HTMLAudioElement + createMediaElementSource** BREAKS on mobile — `createMediaElementSource` throws silently, audio falls back to native path (thin voice), then freezes on subsequent segments. DO NOT use this approach.
-- **PLAYBACK_RATE / pitch-preserved speed** requires HTMLAudioElement, which breaks mobile. If speed change is needed, must find an alternative (e.g., OfflineAudioContext resampling).
+- **PLAYBACK_RATE / pitch-preserved speed** requires HTMLAudioElement, which breaks mobile. Solution: regenerate MP3s at 1.15x via ElevenLabs `speed` parameter (see pending task below).
 - **Effects chain** (effectsChain.ts: EQ + ConvolverNode reverb + echo/robot bursts) works fine on mobile with AudioBufferSourceNode. The chain was mistakenly suspected of breaking mobile audio, but the real culprit was HTMLAudioElement.
 - **AudioContext.resume()** — use fire-and-forget (`ctx.resume().catch(() => {})`) before playback as safety net. NEVER await it in a `.then()` chain — it can hang indefinitely on mobile without user gesture.
 

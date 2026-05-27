@@ -1,5 +1,4 @@
 import type { TTSService, VoiceSettings } from './index';
-import { PLAYBACK_RATE } from './index';
 import type { SpeechSegment, ExperienceVersion, VoiceType } from '@/types';
 import { getAudioContext, getGainNode, getEffectsInput, initAudioContext } from '@/lib/audio/audioContext';
 import { SCRIPT } from '@/data/script';
@@ -26,17 +25,12 @@ export function isOnline(): boolean {
 /**
  * Fallback TTS service that plays pre-recorded audio files.
  * Used when offline or when primary TTS service fails.
- *
- * Uses HTMLAudioElement for playback so that playbackRate changes speed
- * without affecting pitch (preservesPitch=true by default in modern browsers).
- * Audio is routed through the Web Audio effects chain via MediaElementAudioSourceNode.
  */
 export class FallbackTTSService implements TTSService {
   private audioContext: AudioContext | null = null;
-  private currentAudio: HTMLAudioElement | null = null;
+  private currentSource: AudioBufferSourceNode | null = null;
   private cancelled = false;
   private speakGeneration = 0;
-  // Buffer cache kept for preloadAll() — decoding validates the file is playable
   private audioBufferCache = new Map<string, AudioBuffer>();
 
   constructor(context?: AudioContext) {
@@ -54,7 +48,7 @@ export class FallbackTTSService implements TTSService {
     version?: ExperienceVersion,
     voiceType?: VoiceType,
   ): Promise<void> {
-    // Bump generation so stale callbacks from previous speak() are ignored
+    // Bump generation so stale onended callbacks from previous speak() are ignored
     const generation = ++this.speakGeneration;
     this.cancelled = false;
 
@@ -80,13 +74,31 @@ export class FallbackTTSService implements TTSService {
         this.audioContext = await initAudioContext();
       }
 
+      // Check cache first (versioned key to prevent cross-version contamination)
+      const cacheKey = `${version || 'V1'}:${resolvedKey}`;
+      let buffer = this.audioBufferCache.get(cacheKey);
+
+      if (!buffer) {
+        // Fetch and decode audio
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch audio: ${response.status}`);
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        buffer = await this.audioContext.decodeAudioData(arrayBuffer);
+
+        // Cache for future use
+        this.audioBufferCache.set(cacheKey, buffer);
+      }
+
       // Check for cancellation before playback
       if (this.cancelled) {
         throw new Error('Speech cancelled');
       }
 
-      // Play the audio via HTMLAudioElement (pitch-preserved speed)
-      await this.playUrl(url, generation);
+      // Play the audio
+      await this.playBuffer(buffer, generation);
     } catch (error) {
       if (this.cancelled || (error instanceof Error && error.message === 'Speech cancelled')) {
         throw new Error('Speech cancelled');
@@ -101,14 +113,13 @@ export class FallbackTTSService implements TTSService {
    */
   cancel(): void {
     this.cancelled = true;
-    if (this.currentAudio) {
+    if (this.currentSource) {
       try {
-        this.currentAudio.pause();
-        this.currentAudio.currentTime = 0;
+        this.currentSource.stop();
       } catch {
-        // Already stopped
+        // Already stopped or not started
       }
-      this.currentAudio = null;
+      this.currentSource = null;
     }
   }
 
@@ -161,11 +172,10 @@ export class FallbackTTSService implements TTSService {
   }
 
   /**
-   * Plays audio from a URL using HTMLAudioElement for pitch-preserved speed control.
-   * Routes through the Web Audio effects chain via MediaElementAudioSourceNode.
-   * Uses generation token to ignore stale callbacks from previous speak() calls.
+   * Plays an audio buffer using Web Audio API.
+   * Uses generation token to ignore stale onended callbacks from previous speak() calls.
    */
-  private async playUrl(url: string, generation: number): Promise<void> {
+  private async playBuffer(buffer: AudioBuffer, generation: number): Promise<void> {
     if (!this.audioContext) {
       throw new Error('Audio context not initialized');
     }
@@ -176,30 +186,22 @@ export class FallbackTTSService implements TTSService {
         return;
       }
 
-      const audio = new Audio(url);
-      audio.playbackRate = PLAYBACK_RATE;
-      // preservesPitch defaults to true in Chrome/Firefox/Safari
-      audio.preservesPitch = true;
-      audio.crossOrigin = 'anonymous';
-      this.currentAudio = audio;
-
-      // Route through effects chain for phase EQ/reverb
-      try {
-        const mediaSource = this.audioContext!.createMediaElementSource(audio);
-        const effectsInput = getEffectsInput();
-        if (effectsInput) {
-          mediaSource.connect(effectsInput);
-        } else {
-          mediaSource.connect(this.audioContext!.destination);
-        }
-      } catch {
-        // If MediaElementSource fails, let audio play through default output
+      const source = this.audioContext!.createBufferSource();
+      source.buffer = buffer;
+      // Route through effects chain → GainNode so voice gets phase effects + AnalyserNode reads data
+      const effectsInput = getEffectsInput();
+      if (effectsInput) {
+        source.connect(effectsInput);
+      } else {
+        source.connect(this.audioContext!.destination);
       }
 
-      audio.onended = () => {
+      this.currentSource = source;
+
+      source.onended = () => {
         // Ignore stale callbacks from previous speak() calls
         if (generation !== this.speakGeneration) return;
-        this.currentAudio = null;
+        this.currentSource = null;
         if (this.cancelled) {
           reject(new Error('Speech cancelled'));
         } else {
@@ -207,21 +209,11 @@ export class FallbackTTSService implements TTSService {
         }
       };
 
-      audio.onerror = () => {
-        if (generation !== this.speakGeneration) return;
-        this.currentAudio = null;
-        reject(new Error(`Failed to play audio: ${url}`));
-      };
-
-      // Resume AudioContext if suspended (mobile browsers suspend after inactivity).
-      // Fire-and-forget: don't await, as resume() can hang on mobile without user gesture.
-      this.audioContext!.resume().catch(() => {});
-      audio.play().catch((err) => {
-        if (generation !== this.speakGeneration) return;
-        console.warn('[FallbackTTS] audio.play() failed:', err.name, err.message);
-        this.currentAudio = null;
-        reject(err);
-      });
+      try {
+        source.start();
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 

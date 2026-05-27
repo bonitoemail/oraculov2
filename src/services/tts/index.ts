@@ -20,9 +20,6 @@ export const PHASE_VOICE_SETTINGS: Record<NarrativePhase, VoiceSettings> = {
   ENCERRAMENTO: { stability: 0.5, similarity_boost: 0.8, style: 0.3, speed: 0.9, phase: 'ENCERRAMENTO' },
 };
 
-/** Global playback speed multiplier — pitch-preserved via HTMLAudioElement (1.0 = normal) */
-export const PLAYBACK_RATE = 1.15;
-
 export interface TTSService {
   speak(
     segments: SpeechSegment[],

@@ -1,18 +1,11 @@
 import type { TTSService, VoiceSettings } from './index';
-import { PLAYBACK_RATE } from './index';
 import type { SpeechSegment, ExperienceVersion, VoiceType } from '@/types';
 import { getAudioContext, getEffectsInput, initAudioContext } from '@/lib/audio/audioContext';
 import { FallbackTTSService } from './fallback';
 
-/**
- * ElevenLabs TTS service.
- * Uses HTMLAudioElement for playback so that playbackRate changes speed
- * without affecting pitch (preservesPitch=true by default in modern browsers).
- */
 export class ElevenLabsTTSService implements TTSService {
   private audioContext: AudioContext | null = null;
-  private currentAudio: HTMLAudioElement | null = null;
-  private currentBlobUrl: string | null = null;
+  private currentSource: AudioBufferSourceNode | null = null;
   private cancelled = false;
   private fallbackService: TTSService;
 
@@ -60,7 +53,7 @@ export class ElevenLabsTTSService implements TTSService {
 
       // Get audio blob and create object URL
       const audioBlob = await response.blob();
-      const blobUrl = URL.createObjectURL(audioBlob);
+      const audioUrl = URL.createObjectURL(audioBlob);
 
       try {
         // Initialize audio context if needed
@@ -68,15 +61,18 @@ export class ElevenLabsTTSService implements TTSService {
           this.audioContext = getAudioContext() || await initAudioContext();
         }
 
+        // Decode audio data
+        const arrayBuffer = await audioBlob.arrayBuffer();
+        const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+
         if (this.cancelled) {
           throw new Error('Speech cancelled');
         }
 
-        // Play using HTMLAudioElement (pitch-preserved speed)
-        await this.playUrl(blobUrl);
+        // Play using Web Audio API (same pattern as FallbackTTSService)
+        await this.playBuffer(audioBuffer);
       } finally {
-        URL.revokeObjectURL(blobUrl);
-        this.currentBlobUrl = null;
+        URL.revokeObjectURL(audioUrl);
       }
     } catch (error) {
       if (this.cancelled || (error instanceof Error && error.message === 'Speech cancelled')) {
@@ -89,26 +85,17 @@ export class ElevenLabsTTSService implements TTSService {
 
   cancel(): void {
     this.cancelled = true;
-    if (this.currentAudio) {
+    if (this.currentSource) {
       try {
-        this.currentAudio.pause();
-        this.currentAudio.currentTime = 0;
+        this.currentSource.stop();
       } catch {
         // Already stopped
       }
-      this.currentAudio = null;
-    }
-    if (this.currentBlobUrl) {
-      URL.revokeObjectURL(this.currentBlobUrl);
-      this.currentBlobUrl = null;
+      this.currentSource = null;
     }
   }
 
-  /**
-   * Plays audio from a URL using HTMLAudioElement for pitch-preserved speed control.
-   * Routes through the Web Audio effects chain via MediaElementAudioSourceNode.
-   */
-  private async playUrl(url: string): Promise<void> {
+  private async playBuffer(buffer: AudioBuffer): Promise<void> {
     if (!this.audioContext) {
       throw new Error('Audio context not initialized');
     }
@@ -119,28 +106,19 @@ export class ElevenLabsTTSService implements TTSService {
         return;
       }
 
-      const audio = new Audio(url);
-      audio.playbackRate = PLAYBACK_RATE;
-      // preservesPitch defaults to true in Chrome/Firefox/Safari
-      audio.preservesPitch = true;
-      this.currentAudio = audio;
-      this.currentBlobUrl = url;
-
-      // Route through effects chain for phase EQ/reverb
-      try {
-        const mediaSource = this.audioContext!.createMediaElementSource(audio);
-        const effectsInput = getEffectsInput();
-        if (effectsInput) {
-          mediaSource.connect(effectsInput);
-        } else {
-          mediaSource.connect(this.audioContext!.destination);
-        }
-      } catch {
-        // If MediaElementSource fails, let audio play through default output
+      const source = this.audioContext!.createBufferSource();
+      source.buffer = buffer;
+      // Route through effects chain → GainNode so voice gets phase effects + AnalyserNode reads data
+      const effectsInput = getEffectsInput();
+      if (effectsInput) {
+        source.connect(effectsInput);
+      } else {
+        source.connect(this.audioContext!.destination);
       }
+      this.currentSource = source;
 
-      audio.onended = () => {
-        this.currentAudio = null;
+      source.onended = () => {
+        this.currentSource = null;
         if (this.cancelled) {
           reject(new Error('Speech cancelled'));
         } else {
@@ -148,19 +126,11 @@ export class ElevenLabsTTSService implements TTSService {
         }
       };
 
-      audio.onerror = () => {
-        this.currentAudio = null;
-        reject(new Error(`Failed to play audio: ${url}`));
-      };
-
-      // Resume AudioContext if suspended (mobile browsers suspend after inactivity).
-      // Fire-and-forget: don't await, as resume() can hang on mobile without user gesture.
-      this.audioContext!.resume().catch(() => {});
-      audio.play().catch((err) => {
-        console.warn('[ElevenLabs] audio.play() failed:', err.name, err.message);
-        this.currentAudio = null;
+      try {
+        source.start();
+      } catch (err) {
         reject(err);
-      });
+      }
     });
   }
 }

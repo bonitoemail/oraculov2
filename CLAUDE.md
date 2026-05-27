@@ -108,6 +108,11 @@ npx vitest run src/data/  # specific directory
 
 **Known:** 2 test files from v1.0 (`voice-flow-integration.test.ts`, `flow-sequencing.test.ts`) reference obsolete PURGATORIO_A/B states. They need rewrite for v4.0 machine.
 
+## Git Remotes
+
+- **`origin`** → `github.com/oimilo/oraculo` (branch `master`) — source repo
+- **`vercel`** → `github.com/bonitoemail/oraculov2` (branch `main`) — **production deploy**. Always push here for Vercel to build: `git push vercel master:main`
+
 ## Environment Variables
 
 ```bash
@@ -162,6 +167,14 @@ scripts/
 public/audio/prerecorded/      # 82 pre-recorded MP3s (~24MB)
 public/images/oraculogo.png    # Hand-painted logo (used on start screen)
 ```
+
+## Mobile Audio Compatibility (CRITICAL)
+
+- **AudioBufferSourceNode** is the ONLY reliable playback method on mobile. Use `source.connect(effectsInput)` + `source.start()`.
+- **HTMLAudioElement + createMediaElementSource** BREAKS on mobile — `createMediaElementSource` throws silently, audio falls back to native path (thin voice), then freezes on subsequent segments. DO NOT use this approach.
+- **PLAYBACK_RATE / pitch-preserved speed** requires HTMLAudioElement, which breaks mobile. If speed change is needed, must find an alternative (e.g., OfflineAudioContext resampling).
+- **Effects chain** (effectsChain.ts: EQ + ConvolverNode reverb + echo/robot bursts) works fine on mobile with AudioBufferSourceNode. The chain was mistakenly suspected of breaking mobile audio, but the real culprit was HTMLAudioElement.
+- **AudioContext.resume()** — use fire-and-forget (`ctx.resume().catch(() => {})`) before playback as safety net. NEVER await it in a `.then()` chain — it can hang indefinitely on mobile without user gesture.
 
 ## Important Constraints
 

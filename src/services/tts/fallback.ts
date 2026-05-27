@@ -213,16 +213,12 @@ export class FallbackTTSService implements TTSService {
         reject(new Error(`Failed to play audio: ${url}`));
       };
 
-      // Resume AudioContext if suspended (mobile browsers suspend after inactivity)
-      this.audioContext!.resume().then(() => {
-        audio.play().catch((err) => {
-          if (generation !== this.speakGeneration) return;
-          console.warn('[FallbackTTS] audio.play() failed:', err.name, err.message);
-          this.currentAudio = null;
-          reject(err);
-        });
-      }).catch((err) => {
-        console.warn('[FallbackTTS] AudioContext resume failed:', err);
+      // Resume AudioContext if suspended (mobile browsers suspend after inactivity).
+      // Fire-and-forget: don't await, as resume() can hang on mobile without user gesture.
+      this.audioContext!.resume().catch(() => {});
+      audio.play().catch((err) => {
+        if (generation !== this.speakGeneration) return;
+        console.warn('[FallbackTTS] audio.play() failed:', err.name, err.message);
         this.currentAudio = null;
         reject(err);
       });
